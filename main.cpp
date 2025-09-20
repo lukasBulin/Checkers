@@ -1,9 +1,11 @@
 #include <iostream>
+#include "CheckerBoard.h"
 using namespace std;
 
 int main() {
 
-	cout << "Hello World" << endl;
+	CCheckerBoard board;
 
 	return 0;
 }
+
