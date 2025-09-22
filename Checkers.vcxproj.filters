@@ -21,9 +21,15 @@
     <ClCompile Include="CheckerBoard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CheckerBoard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

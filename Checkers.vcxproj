@@ -129,9 +129,11 @@
   <ItemGroup>
     <ClCompile Include="CheckerBoard.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RenderBoard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CheckerBoard.h" />
+    <ClInclude Include="RenderBoard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
