@@ -6,7 +6,7 @@ class CRenderBoard
 {
 public:
 
-	void RenderCheckerBoard(CCheckerBoard* board);
+	void RenderCheckerBoard(const CCheckerBoard* board);
 
 private:
 

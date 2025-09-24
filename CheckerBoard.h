@@ -19,6 +19,8 @@ public:
 
 	void SetValueAt(int row, int col, ECheckerType value);
 
+	void ResetBoard();
+
 private:
 
 	static const int boardSize = 8;
