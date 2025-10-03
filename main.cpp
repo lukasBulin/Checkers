@@ -2,6 +2,7 @@
 #include "CheckerBoard.h"
 #include "RenderBoard.h"
 #include "PlayerInput.h"
+#include <iostream>
 using namespace std;
 
 int main() {
@@ -21,7 +22,10 @@ int main() {
 	{
 		/*board.SetValueAt(distBoardLocation(gen), distBoardLocation(gen), static_cast<ECheckerType>(distCheckerType(gen)));*/
 		render.RenderCheckerBoard(&board);
-		player.ProcessPlayerInput(&board);
+
+		const SNextMove nextMove = player.ProcessPlayerInput(&board);
+
+		cout << nextMove.startCol << nextMove.startRow << endl;
 	}
 
 	return 0;
