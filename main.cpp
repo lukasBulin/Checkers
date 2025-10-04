@@ -3,6 +3,7 @@
 #include "RenderBoard.h"
 #include "PlayerInput.h"
 #include <iostream>
+#include <conio.h>
 using namespace std;
 
 int main() {
@@ -25,9 +26,16 @@ int main() {
 
 		const SNextMove nextMove = player.ProcessPlayerInput(&board);
 
-
-
-		cout << nextMove.startCol << nextMove.startRow << endl;
+		if (board.IsValidMove(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol))
+		{
+			board.MoveChecker(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol);
+		}
+		else
+		{
+			//player chose invalid tile
+			cout << "Invalid Move, Try Again!, Press Any Key" << endl;
+			_getch();
+		}
 	}
 
 	return 0;

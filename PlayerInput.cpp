@@ -16,7 +16,7 @@ SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
 	//Start C & R
 
 	do {
-		cout << "Enter start Column (a-h) : ";
+		cout << "Enter start Column (a-h): ";
 		SCol = _getch();
 		cout << SCol << endl;
 
@@ -27,7 +27,8 @@ SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
 		nextMove.startCol = SCol - 'a';
 		nextMove.startRow = SRow - '1';
 
-		if (IsValidPosition(nextMove.startRow, nextMove.startCol, board)) {
+		if (IsValidPosition(nextMove.startRow, nextMove.startCol, board))
+		{
 			break;
 		}
 
@@ -50,7 +51,8 @@ SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
 		nextMove.endCol = ECol - 'a';
 		nextMove.endRow = ERow - '1';
 
-		if (IsValidPosition(nextMove.endRow, nextMove.endCol, board)) {
+		if (IsValidPosition(nextMove.endRow, nextMove.endCol, board))
+		{
 			break;
 		}
 

@@ -13,15 +13,15 @@ public:
 
 	CCheckerBoard();
 
+	void ResetBoard();
+
 	int GetBoardSize() const;
 
 	ECheckerType GetValueAt(int row, int col) const;
-
 	void SetValueAt(int row, int col, ECheckerType value);
 
-	void ResetBoard();
-
 	bool IsValidMove(int startRow, int startCol, int endRow, int endCol) const;
+	void MoveChecker(int startRow, int startCol, int endRow, int endCol);
 
 private:
 
