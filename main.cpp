@@ -10,25 +10,26 @@ int main() {
 
 	CCheckerBoard board;
 	CRenderBoard render;
-	CPlayerInput player;
+	CPlayerInput playerWhite;
+	CPlayerInput playerBlack;
 
-	/*random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<> distBoardLocation(0, 7);
-	uniform_int_distribution<> distCheckerType(0, 2);*/
+	bool whiteTurn = true;
 
 	board.ResetBoard();
 
 	while (true)
 	{
-		/*board.SetValueAt(distBoardLocation(gen), distBoardLocation(gen), static_cast<ECheckerType>(distCheckerType(gen)));*/
 		render.RenderCheckerBoard(&board);
 
-		const SNextMove nextMove = player.ProcessPlayerInput(&board);
+		cout << (whiteTurn ? "White Turn!" : "Black Turn!") << endl;
 
-		if (board.IsValidMove(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol))
+		const SNextMove nextMove = whiteTurn ? playerWhite.ProcessPlayerInput(&board) : playerBlack.ProcessPlayerInput(&board);
+
+		if (board.IsValidMove(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol, whiteTurn ? ECheckerType::white : ECheckerType::black))
 		{
 			board.MoveChecker(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol);
+
+			whiteTurn = !whiteTurn;
 		}
 		else
 		{

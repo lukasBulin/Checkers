@@ -20,7 +20,7 @@ public:
 	ECheckerType GetValueAt(int row, int col) const;
 	void SetValueAt(int row, int col, ECheckerType value);
 
-	bool IsValidMove(int startRow, int startCol, int endRow, int endCol) const;
+	bool IsValidMove(int startRow, int startCol, int endRow, int endCol, ECheckerType checkerType) const;
 	void MoveChecker(int startRow, int startCol, int endRow, int endCol);
 
 private:

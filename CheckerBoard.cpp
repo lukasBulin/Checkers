@@ -63,9 +63,9 @@ void CCheckerBoard::ResetBoard()
 	}
 }
 
-bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endCol) const
+bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endCol, ECheckerType checkerType) const
 {
-	if (board[startRow][startCol] != ECheckerType::none && board[endRow][endCol] == ECheckerType::none)
+	if (board[startRow][startCol] == checkerType && board[endRow][endCol] == ECheckerType::none)
 	{
 		//row is even/odd and col is even/odd
 		if ((endRow % 2 == 0 && endCol % 2 == 0) || (endRow % 2 == 1 && endCol % 2 == 1))
