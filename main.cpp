@@ -25,6 +25,8 @@ int main() {
 
 		const SNextMove nextMove = player.ProcessPlayerInput(&board);
 
+
+
 		cout << nextMove.startCol << nextMove.startRow << endl;
 	}
 

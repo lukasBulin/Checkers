@@ -61,3 +61,8 @@ void CCheckerBoard::ResetBoard()
 		}
 	}
 }
+
+bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endCol) const
+{
+	
+}

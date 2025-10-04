@@ -21,6 +21,8 @@ public:
 
 	void ResetBoard();
 
+	bool IsValidMove(int startRow, int startCol, int endRow, int endCol) const;
+
 private:
 
 	static const int boardSize = 8;

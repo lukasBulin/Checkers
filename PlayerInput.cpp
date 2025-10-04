@@ -1,6 +1,7 @@
 #include "PlayerInput.h"
 #include "CheckerBoard.h"
 #include <iostream>
+#include <conio.h>
 using namespace std;
 
 SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
@@ -15,16 +16,16 @@ SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
 	//Start C & R
 
 	do {
-		cout << "Enter start Column (a-h): ";
-		cin >> SCol;
-		cin.ignore();
+		cout << "Enter start Column (a-h) : ";
+		SCol = _getch();
+		cout << SCol << endl;
 
 		cout << "Enter start Row (1-8): ";
-		cin >> SRow;
-		cin.ignore();
+		SRow = _getch();
+		cout << SRow << endl;
 
 		nextMove.startCol = SCol - 'a';
-		nextMove.startRow = board->GetBoardSize() - (SRow - '0');
+		nextMove.startRow = SRow - '1';
 
 		if (IsValidPosition(nextMove.startRow, nextMove.startCol, board)) {
 			break;
@@ -37,19 +38,17 @@ SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
 
 	//End C & R
 
-	//error with invalid input; enter d and 111 leads to error
-
 	do {
 		cout << "Enter end Column (a-h): ";
-		cin >> ECol;
-		cin.ignore();
+		ECol = _getch();
+		cout << ECol << endl;
 
 		cout << "Enter end Row (1-8): ";
-		cin >> ERow;
-		cin.ignore();
+		ERow = _getch();
+		cout << ERow << endl;
 
 		nextMove.endCol = ECol - 'a';
-		nextMove.endRow = board->GetBoardSize() - (ERow - '0');
+		nextMove.endRow = ERow - '1';
 
 		if (IsValidPosition(nextMove.endRow, nextMove.endCol, board)) {
 			break;
@@ -59,15 +58,12 @@ SNextMove CPlayerInput::ProcessPlayerInput(const CCheckerBoard* board)
 	
 	} while (true);
 
+
+
 	return nextMove;
 }
 
 bool CPlayerInput::IsValidPosition(int row, int col, const CCheckerBoard* board)
 {
 	return row >= 0 && row < board->GetBoardSize() && col >= 0 && col < board->GetBoardSize();
-}
-
-bool CPlayerInput::IsValidMove(int startRow, int startCol, int endRow, int endCol)
-{
-	return 0;
 }

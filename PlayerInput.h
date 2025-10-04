@@ -28,6 +28,5 @@ public:
 private:
 
 	bool IsValidPosition(int row, int col, const CCheckerBoard* board);
-	bool IsValidMove(int startRow, int startCol, int endRow, int endCol);
 
 };
