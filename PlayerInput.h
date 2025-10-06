@@ -12,6 +12,8 @@ struct SNextMove
 	int endCol = invalidCoordinate;
 	int endRow = invalidCoordinate;
 
+	//add info about which tile should be removed, int RowTodelete & colToDeltete
+
 	bool IsValid() const
 	{
 		return startCol != invalidCoordinate && startRow != invalidCoordinate

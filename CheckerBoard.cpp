@@ -38,23 +38,23 @@ void CCheckerBoard::ResetBoard()
 	{
 		for (int col = 0; col < boardSize; col++)
 		{
-			//white checkers (o), even row
+			// white checkers (o), even row
 			if ((row <= 2) && (row % 2 == 0) && (col % 2 == 0))
 			{
 				board[row][col] = ECheckerType::white;
 			}
-			//white checkers (o), odd row
+			// white checkers (o), odd row
 			else if ((row <= 2) && (row % 2 != 0) && (col % 2 != 0))
 			{
 				board[row][col] = ECheckerType::white;
 			}
 
-			//black checkers (x), even row
+			// black checkers (x), even row
 			if ((row >= 5 && row <= 7) && (row % 2 == 0) && (col % 2 == 0))
 			{
 				board[row][col] = ECheckerType::black;
 			}
-			//black checkers (x), odd row
+			// black checkers (x), odd row
 			else if ((row >= 5 && row <= 7) && (row % 2 != 0) && (col % 2 != 0))
 			{
 				board[row][col] = ECheckerType::black;
@@ -65,15 +65,73 @@ void CCheckerBoard::ResetBoard()
 
 bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endCol, ECheckerType checkerType) const
 {
-	if (board[startRow][startCol] == checkerType && board[endRow][endCol] == ECheckerType::none)
+	// starting cordinates are not on a checker
+	if (board[startRow][startCol] != checkerType)
 	{
-		//row is even/odd and col is even/odd
-		if ((endRow % 2 == 0 && endCol % 2 == 0) || (endRow % 2 == 1 && endCol % 2 == 1))
+		return false;
+	}
+
+	// ending cordinates are not on an open tile
+	if (board[endRow][endCol] != ECheckerType::none)
+	{
+		return false;
+	}
+
+	// even row, odd col
+	if (endRow % 2 == 0 && endCol % 2 == 1)
+	{
+		return false;
+	}
+
+	// odd row, even col
+	if (endRow % 2 == 1 && endCol % 2 == 0)
+	{
+		return false;
+	}
+
+	// white takes black
+	if (checkerType == ECheckerType::white && endRow == startRow + 2)
+	{
+		if ((endCol == startCol + 2 && board[startRow + 1][startCol + 1] == ECheckerType::black) ||
+			(endCol == startCol - 2 && board[startRow + 1][startCol - 1] == ECheckerType::black))
 		{
 			return true;
 		}
+
+		return false;
 	}
-	return false;
+
+	// black takes white
+	if (checkerType == ECheckerType::black && endRow == startRow - 2)
+	{
+		if ((endCol == startCol + 2 && board[startRow - 1][startCol + 1] == ECheckerType::white) ||
+			(endCol == startCol - 2 && board[startRow - 1][startCol - 1] == ECheckerType::white))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	// white checker, row change by +1
+	if ((checkerType == ECheckerType::white) && (endRow - startRow != 1))
+	{
+		return false;
+	}
+
+	// black checker, row change by -1
+	if ((checkerType == ECheckerType::black) && (endRow - startRow != -1))
+	{
+		return false;
+	}
+
+	// white/black checker, col change by 1 or -1
+	if (endCol - startCol != -1 && endCol - startCol != 1)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void CCheckerBoard::MoveChecker(int startRow, int startCol, int endRow, int endCol)
