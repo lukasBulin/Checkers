@@ -1,4 +1,5 @@
 #include "CheckerBoard.h"
+#include "PlayerInput.h"
 #include <iostream>
 #include <assert.h>
 using namespace std;
@@ -63,38 +64,45 @@ void CCheckerBoard::ResetBoard()
 	}
 }
 
-bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endCol, ECheckerType checkerType) const
+bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 {
 	// starting cordinates are not on a checker
-	if (board[startRow][startCol] != checkerType)
+	if (board[nextMove.startRow][nextMove.startCol] != nextMove.checkerType)
 	{
 		return false;
 	}
 
 	// ending cordinates are not on an open tile
-	if (board[endRow][endCol] != ECheckerType::none)
+	if (board[nextMove.endRow][nextMove.endCol] != ECheckerType::none)
 	{
 		return false;
 	}
 
 	// even row, odd col
-	if (endRow % 2 == 0 && endCol % 2 == 1)
+	if (nextMove.endRow % 2 == 0 && nextMove.endCol % 2 == 1)
 	{
 		return false;
 	}
 
 	// odd row, even col
-	if (endRow % 2 == 1 && endCol % 2 == 0)
+	if (nextMove.endRow % 2 == 1 && nextMove.endCol % 2 == 0)
 	{
 		return false;
 	}
 
 	// white takes black
-	if (checkerType == ECheckerType::white && endRow == startRow + 2)
+	if (nextMove.checkerType == ECheckerType::white && nextMove.endRow == nextMove.startRow + 2)
 	{
-		if ((endCol == startCol + 2 && board[startRow + 1][startCol + 1] == ECheckerType::black) ||
-			(endCol == startCol - 2 && board[startRow + 1][startCol - 1] == ECheckerType::black))
+		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow + 1][nextMove.startCol + 1] == ECheckerType::black)
 		{
+			nextMove.rowToDelete = nextMove.startRow + 1;
+			nextMove.colToDelete = nextMove.startCol + 1;
+			return true;
+		}
+		else if	(nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow + 1][nextMove.startCol - 1] == ECheckerType::black)
+		{
+			nextMove.rowToDelete = nextMove.startRow + 1;
+			nextMove.colToDelete = nextMove.startCol - 1;
 			return true;
 		}
 
@@ -102,11 +110,18 @@ bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endC
 	}
 
 	// black takes white
-	if (checkerType == ECheckerType::black && endRow == startRow - 2)
+	if (nextMove.checkerType == ECheckerType::black && nextMove.endRow == nextMove.startRow - 2)
 	{
-		if ((endCol == startCol + 2 && board[startRow - 1][startCol + 1] == ECheckerType::white) ||
-			(endCol == startCol - 2 && board[startRow - 1][startCol - 1] == ECheckerType::white))
+		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow - 1][nextMove.startCol + 1] == ECheckerType::white)
 		{
+			nextMove.rowToDelete = nextMove.startRow - 1;
+			nextMove.colToDelete = nextMove.startCol + 1;
+			return true;
+		}
+		else if (nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow - 1][nextMove.startCol - 1] == ECheckerType::white)
+		{
+			nextMove.rowToDelete = nextMove.startRow - 1;
+			nextMove.colToDelete = nextMove.startCol - 1;
 			return true;
 		}
 
@@ -114,19 +129,19 @@ bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endC
 	}
 
 	// white checker, row change by +1
-	if ((checkerType == ECheckerType::white) && (endRow - startRow != 1))
+	if ((nextMove.checkerType == ECheckerType::white) && (nextMove.endRow - nextMove.startRow != 1))
 	{
 		return false;
 	}
 
 	// black checker, row change by -1
-	if ((checkerType == ECheckerType::black) && (endRow - startRow != -1))
+	if ((nextMove.checkerType == ECheckerType::black) && (nextMove.endRow - nextMove.startRow != -1))
 	{
 		return false;
 	}
 
 	// white/black checker, col change by 1 or -1
-	if (endCol - startCol != -1 && endCol - startCol != 1)
+	if (nextMove.endCol - nextMove.startCol != -1 && nextMove.endCol - nextMove.startCol != 1)
 	{
 		return false;
 	}
@@ -134,11 +149,16 @@ bool CCheckerBoard::IsValidMove(int startRow, int startCol, int endRow, int endC
 	return true;
 }
 
-void CCheckerBoard::MoveChecker(int startRow, int startCol, int endRow, int endCol)
+void CCheckerBoard::MoveChecker(const SNextMove& nextMove)
 {
-	ECheckerType checkerType = GetValueAt(startRow, startCol);
+	ECheckerType checkerType = GetValueAt(nextMove.startRow, nextMove.startCol);
 
-	SetValueAt(endRow, endCol, checkerType);
+	SetValueAt(nextMove.endRow, nextMove.endCol, checkerType);
 
-	SetValueAt(startRow, startCol, ECheckerType::none);
+	SetValueAt(nextMove.startRow, nextMove.startCol, ECheckerType::none);
+
+	if (nextMove.rowToDelete != SNextMove::invalidCoordinate && nextMove.colToDelete != SNextMove::invalidCoordinate)
+	{
+		SetValueAt(nextMove.rowToDelete, nextMove.colToDelete, ECheckerType::none);
+	}
 }

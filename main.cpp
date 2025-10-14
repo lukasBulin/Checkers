@@ -23,11 +23,13 @@ int main() {
 
 		cout << (whiteTurn ? "White Turn!" : "Black Turn!") << endl;
 
-		const SNextMove nextMove = whiteTurn ? playerWhite.ProcessPlayerInput(&board) : playerBlack.ProcessPlayerInput(&board);
+		SNextMove nextMove = whiteTurn ? playerWhite.ProcessPlayerInput(&board) : playerBlack.ProcessPlayerInput(&board);
 
-		if (board.IsValidMove(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol, whiteTurn ? ECheckerType::white : ECheckerType::black))
+		nextMove.checkerType = whiteTurn ? ECheckerType::white : ECheckerType::black;
+
+		if (board.ValidateMove(nextMove))
 		{
-			board.MoveChecker(nextMove.startRow, nextMove.startCol, nextMove.endRow, nextMove.endCol);
+			board.MoveChecker(nextMove);
 
 			whiteTurn = !whiteTurn;
 		}

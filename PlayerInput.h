@@ -1,4 +1,5 @@
 #pragma once
+#include "CheckerBoard.h"
 
 class CCheckerBoard;
 
@@ -12,12 +13,16 @@ struct SNextMove
 	int endCol = invalidCoordinate;
 	int endRow = invalidCoordinate;
 
-	//add info about which tile should be removed, int RowTodelete & colToDeltete
+	ECheckerType checkerType = ECheckerType::none;
+
+	int colToDelete = invalidCoordinate;
+	int rowToDelete = invalidCoordinate;
 
 	bool IsValid() const
 	{
 		return startCol != invalidCoordinate && startRow != invalidCoordinate
-			   && endCol != invalidCoordinate && endRow != invalidCoordinate;
+			   && endCol != invalidCoordinate && endRow != invalidCoordinate
+			   && checkerType != ECheckerType::none;
 	}
 };
 
