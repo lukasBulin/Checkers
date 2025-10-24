@@ -13,6 +13,7 @@ public:
 	virtual bool CreateWindow() override { return true; };
 
 	virtual void RenderCheckerBoard(const CCheckerBoard* board) override;
+	virtual void RenderRedChecker(float x, float y) override;
 
 	virtual bool IsWindowClosed() const override { return false; };
 

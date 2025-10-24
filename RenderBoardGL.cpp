@@ -4,6 +4,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <iostream>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
 
 using namespace std;
 
@@ -108,6 +112,42 @@ void CRenderBoardGL::SetupBoardGeometry() {
     glBindVertexArray(0);
 }
 
+void CRenderBoardGL::SetupRedCheckerGeometry()
+{
+    float vertices[] = {
+        // positions     // tex coords
+        -0.1f, -0.1f,     0.0f, 0.0f,
+         0.1f, -0.1f,     1.0f, 0.0f,
+         0.1f,  0.1f,     1.0f, 1.0f,
+        -0.1f,  0.1f,     0.0f, 1.0f
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    glGenVertexArrays(1, &redCheckerVAO);
+    glGenBuffers(1, &redCheckerVBO);
+    glGenBuffers(1, &redCheckerEBO);
+
+    glBindVertexArray(redCheckerVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, redCheckerVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, redCheckerEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+}
+
 bool CRenderBoardGL::InitializeRender() {
     glfwMakeContextCurrent(window);
 
@@ -121,9 +161,12 @@ bool CRenderBoardGL::InitializeRender() {
     if (!InitializeShaders()) return false;
 
     SetupBoardGeometry();
+    SetupRedCheckerGeometry();
 
+    //board Texture
     boardTexture = LoadTexture("Images/CheckerBoard.jpg");
-    if (boardTexture == 0) return false;
+    if (boardTexture == 0) 
+        return false;
 
     return true;
 }
@@ -187,9 +230,31 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board) {
 
     glBindVertexArray(0);
 
+    RenderRedChecker(0.0f, 0.0f); // Example position
+
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
+
+void CRenderBoardGL::RenderRedChecker(float x, float y) {
+
+    glUseProgram(shaderProgram);
+
+    glBindVertexArray(redCheckerVAO);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, redCheckerTexture);
+    glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+
+}
+
 
 bool CRenderBoardGL::IsWindowClosed() const {
     return glfwWindowShouldClose(window);

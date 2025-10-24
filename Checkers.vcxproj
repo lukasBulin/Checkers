@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\lukib\Documents\libraries\glfw-3.4.bin.WIN64\include;C:\Users\lukib\Documents\CheckersGame\Checkers\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\lukib\Documents\libraries\glfw-3.4.bin.WIN64\include;C:\Users\lukib\Documents\CheckersGame\Checkers\glad\include;C:\Users\lukib\Documents\CheckersGame\Checkers\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\lukib\Documents\libraries\glfw-3.4.bin.WIN64\include;C:\Users\lukib\Documents\CheckersGame\Checkers\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\lukib\Documents\libraries\glfw-3.4.bin.WIN64\include;C:\Users\lukib\Documents\CheckersGame\Checkers\glad\include;C:\Users\lukib\Documents\CheckersGame\Checkers\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -33,6 +33,7 @@ int main() {
 	while (!bWindowClosed)
 	{
 		render.RenderCheckerBoard(&board);
+		/*render.RenderRedChecker(0.0f, 0.0f);*/
 
 		//cout << (whiteTurn ? "White Turn!" : "Black Turn!") << endl;
 
