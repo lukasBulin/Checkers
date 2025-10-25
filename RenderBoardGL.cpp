@@ -8,11 +8,11 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-
 using namespace std;
 
 // Helper function to compile shaders
-bool CRenderBoardGL::CompileShader(GLuint& shader, GLenum type, const char* source) {
+bool CRenderBoardGL::CompileShader(GLuint& shader, GLenum type, const char* source) 
+{
     shader = glCreateShader(type);
     glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
@@ -29,16 +29,20 @@ bool CRenderBoardGL::CompileShader(GLuint& shader, GLenum type, const char* sour
     return true;
 }
 
-bool CRenderBoardGL::InitializeShaders() {
+bool CRenderBoardGL::InitializeShaders() 
+{
     const char* vertexShaderSource = R"(
         #version 330 core
         layout(location = 0) in vec2 aPos;
         layout(location = 1) in vec2 aTexCoord;
 
+        uniform mat4 uTransform;
+        uniform mat4 uProjection;
+
         out vec2 TexCoord;
 
         void main() {
-            gl_Position = vec4(aPos, 0.0, 1.0);
+            gl_Position = uProjection * uTransform * vec4(aPos, 0.0, 1.0);
             TexCoord = aTexCoord;
         }
     )";
@@ -77,13 +81,14 @@ bool CRenderBoardGL::InitializeShaders() {
     return true;
 }
 
-void CRenderBoardGL::SetupBoardGeometry() {
+void CRenderBoardGL::SetupBoardGeometry() 
+{
     float vertices[] = {
         // positions   // tex coords
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f,
-        -1.0f,  1.0f,  0.0f, 1.0f
+         0.0f,  0.0f,  0.0f, 0.0f,
+      800.0f,   0.0f,  1.0f, 0.0f,
+      800.0f, 800.0f,  1.0f, 1.0f,
+        0.0f, 800.0f,  0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -116,10 +121,10 @@ void CRenderBoardGL::SetupRedCheckerGeometry()
 {
     float vertices[] = {
         // positions     // tex coords
-        -0.1f, -0.1f,     0.0f, 0.0f,
-         0.1f, -0.1f,     1.0f, 0.0f,
-         0.1f,  0.1f,     1.0f, 1.0f,
-        -0.1f,  0.1f,     0.0f, 1.0f
+         0.0f,  0.0f,  0.0f, 0.0f,
+      100.0f,   0.0f,  1.0f, 0.0f,
+      100.0f, 100.0f,  1.0f, 1.0f,
+        0.0f, 100.0f,  0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -127,16 +132,16 @@ void CRenderBoardGL::SetupRedCheckerGeometry()
         2, 3, 0
     };
 
-    glGenVertexArrays(1, &redCheckerVAO);
-    glGenBuffers(1, &redCheckerVBO);
-    glGenBuffers(1, &redCheckerEBO);
+    glGenVertexArrays(1, &CheckerVAO);
+    glGenBuffers(1, &CheckerVBO);
+    glGenBuffers(1, &CheckerEBO);
 
-    glBindVertexArray(redCheckerVAO);
+    glBindVertexArray(CheckerVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, redCheckerVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, CheckerVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, redCheckerEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CheckerEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
@@ -148,7 +153,8 @@ void CRenderBoardGL::SetupRedCheckerGeometry()
     glBindVertexArray(0);
 }
 
-bool CRenderBoardGL::InitializeRender() {
+bool CRenderBoardGL::InitializeRender() 
+{
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -168,13 +174,24 @@ bool CRenderBoardGL::InitializeRender() {
     if (boardTexture == 0) 
         return false;
 
+    //redChecker Texture
+    redCheckerTexture = LoadTexture("Images/CheckerPieceRed.png");
+    if (redCheckerTexture == 0)
+        return false;
+
+    //redChecker Texture
+    blackCheckerTexture = LoadTexture("Images/CheckerPieceBlack.png");
+    if (blackCheckerTexture == 0)
+        return false;
+
     return true;
 }
 
-bool CRenderBoardGL::CreateWindow() {
+bool CRenderBoardGL::CreateWindow() 
+{
     if (!glfwInit()) return false;
 
-    window = glfwCreateWindow(640, 480, "Sprite Example", nullptr, nullptr);
+    window = glfwCreateWindow(800, 800, "Sprite Example", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return false;
@@ -189,7 +206,8 @@ bool CRenderBoardGL::CreateWindow() {
     return true;
 }
 
-GLuint CRenderBoardGL::LoadTexture(const char* filepath) {
+GLuint CRenderBoardGL::LoadTexture(const char* filepath) 
+{
     int width, height, channels;
     unsigned char* data = stbi_load(filepath, &width, &height, &channels, 0);
     if (!data) {
@@ -215,10 +233,20 @@ GLuint CRenderBoardGL::LoadTexture(const char* filepath) {
     return textureID;
 }
 
-void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board) {
+void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board) 
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
+
+    GLint loc = glGetUniformLocation(shaderProgram, "uTransform");
+    if (loc == -1) {
+        std::cerr << "uTransform not found in shader!" << std::endl;
+    }
+
+    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
+
 
     glBindVertexArray(boardVAO);
 
@@ -226,25 +254,65 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board) {
     glBindTexture(GL_TEXTURE_2D, boardTexture);
     glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
 
+
+    glm::mat4 boardTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(boardTransform));
+
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
 
-    RenderRedChecker(0.0f, 0.0f); // Example position
+    RenderAllCheckers(board);
+
+    //RenderChecker(100.0f, 100.0f); // Example position
+    //RenderChecker(300.f, 300.f);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
 
-void CRenderBoardGL::RenderRedChecker(float x, float y) {
+void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
+{
+    //clear console
+    system("cls");
 
-    glUseProgram(shaderProgram);
+    assert(board != nullptr);
 
-    glBindVertexArray(redCheckerVAO);
+    for (int row = board->GetBoardSize() - 1; row >= 0; row--)
+    {
+
+        for (int col = 0; col < board->GetBoardSize(); col++)
+        {
+            const ECheckerType value = board->GetValueAt(row, col);
+
+            switch (value)
+            {
+            case ECheckerType::white:
+                RenderChecker(col * 100, row * 100, redCheckerTexture);
+                break;
+            case ECheckerType::black:
+                RenderChecker(col * 100, row * 100, blackCheckerTexture);
+                break;
+
+            }
+        }
+    }
+}
+
+void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture)
+{
+
+    //glUseProgram(shaderProgram);
+
+    glBindVertexArray(CheckerVAO);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, redCheckerTexture);
-    glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    //glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
+
+    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
@@ -252,15 +320,15 @@ void CRenderBoardGL::RenderRedChecker(float x, float y) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
-
 }
 
-
-bool CRenderBoardGL::IsWindowClosed() const {
+bool CRenderBoardGL::IsWindowClosed() const 
+{
     return glfwWindowShouldClose(window);
 }
 
-void CRenderBoardGL::DeinitializeWindow() {
+void CRenderBoardGL::DeinitializeWindow() 
+{
     glDeleteVertexArrays(1, &boardVAO);
     glDeleteBuffers(1, &boardVBO);
     glDeleteBuffers(1, &boardEBO);

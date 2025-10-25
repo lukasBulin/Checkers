@@ -12,7 +12,6 @@ public:
 	virtual bool CreateWindow() = 0;
 
 	virtual void RenderCheckerBoard(const CCheckerBoard* board) = 0;
-	virtual void RenderRedChecker(float x, float y) = 0;
 
 	virtual bool IsWindowClosed() const = 0;
 
