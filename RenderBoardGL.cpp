@@ -7,7 +7,6 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
-
 using namespace std;
 
 // Helper function to compile shaders
@@ -122,9 +121,9 @@ void CRenderBoardGL::SetupRedCheckerGeometry()
     float vertices[] = {
         // positions     // tex coords
          0.0f,  0.0f,  0.0f, 0.0f,
-      100.0f,   0.0f,  1.0f, 0.0f,
-      100.0f, 100.0f,  1.0f, 1.0f,
-        0.0f, 100.0f,  0.0f, 1.0f
+      80.0f,   0.0f,  1.0f, 0.0f,
+      80.0f, 80.0f,  1.0f, 1.0f,
+        0.0f, 80.0f,  0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -289,10 +288,10 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
             switch (value)
             {
             case ECheckerType::white:
-                RenderChecker(col * 100, row * 100, redCheckerTexture);
+                RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture);
                 break;
             case ECheckerType::black:
-                RenderChecker(col * 100, row * 100, blackCheckerTexture);
+                RenderChecker(col * 100 + 10, row * 100 + 10, blackCheckerTexture);
                 break;
 
             }
@@ -303,13 +302,10 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
 void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture)
 {
 
-    //glUseProgram(shaderProgram);
-
     glBindVertexArray(CheckerVAO);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-    //glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
 
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
