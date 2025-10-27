@@ -1,4 +1,5 @@
 #include "CheckerBoard.h"
+#include "GameState.h"
 #include "RenderBoardConsole.h"
 #include "RenderBoardGL.h"
 #include "PlayerInput.h"
@@ -13,8 +14,9 @@ int main() {
 	CRenderBoardGL render;
 	CPlayerInput playerWhite;
 	CPlayerInput playerBlack;
+	CGameState gameState;
 
-	if (!render.CreateWindow())
+	if (!render.CreateWindow(&gameState))
 	{
 		return -1;
 	}

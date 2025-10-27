@@ -5,6 +5,7 @@
 
 class CCheckerBoard;
 struct GLFWwindow;
+class CGameState;
 
 class CRenderBoardGL : public CRenderBoard
 {
@@ -12,14 +13,16 @@ public:
 
 	virtual void DeinitializeWindow() override;
 
-	virtual bool CreateWindow() override;
+	virtual bool CreateWindow(CGameState* inGameState) override;
 
 	virtual void RenderCheckerBoard(const CCheckerBoard* board) override;
 
 	virtual bool IsWindowClosed() const override;
-	
+
 private:
-	
+
+	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+
 	void RenderAllCheckers(const CCheckerBoard* board);
 
 	void RenderChecker(float x, float y, GLuint texture);
@@ -33,6 +36,7 @@ private:
 	virtual bool InitializeRender() override;
 	GLuint LoadTexture(const char* filepath);
 
+	CGameState* gameState = nullptr;
 	GLFWwindow* window = nullptr;
 
 	GLuint shaderProgram = 0;

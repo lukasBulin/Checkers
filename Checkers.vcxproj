@@ -137,6 +137,7 @@
     <ClCompile Include="glad\src\glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerInput.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="RenderBoard.cpp" />
     <ClCompile Include="RenderBoardConsole.cpp" />
     <ClCompile Include="RenderBoardGL.cpp" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="CheckerBoard.h" />
     <ClInclude Include="PlayerInput.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="RenderBoard.h" />
     <ClInclude Include="RenderBoardConsole.h" />
     <ClInclude Include="RenderBoardGL.h" />

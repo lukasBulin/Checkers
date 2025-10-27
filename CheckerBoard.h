@@ -1,6 +1,7 @@
 #pragma once
 
 struct SNextMove;
+class CPlayerInput;
 
 enum ECheckerType 
 {

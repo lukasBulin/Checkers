@@ -32,7 +32,7 @@ public:
 
 	SNextMove ProcessPlayerInput(const CCheckerBoard* board);
 
-private:
+protected:
 
 	bool IsValidPosition(int row, int col, const CCheckerBoard* board);
 

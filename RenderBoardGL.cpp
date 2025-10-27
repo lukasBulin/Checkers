@@ -1,6 +1,6 @@
-
 #include "RenderBoardGL.h"
 #include "CheckerBoard.h"
+#include "GameState.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <iostream>
@@ -186,23 +186,50 @@ bool CRenderBoardGL::InitializeRender()
     return true;
 }
 
-bool CRenderBoardGL::CreateWindow() 
+bool CRenderBoardGL::CreateWindow(CGameState* inGameState)
 {
-    if (!glfwInit()) return false;
+    if (!glfwInit())
+    {
+        return false;
+    }
 
     window = glfwCreateWindow(800, 800, "Sprite Example", nullptr, nullptr);
-    if (!window) {
+    if (!window)
+    {
         glfwTerminate();
         return false;
     }
 
-    if (!InitializeRender()) return false;
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetWindowUserPointer(window, this); // So we can access the instance in the static callback
+
+    if (!InitializeRender())
+    {
+        return false;
+    }
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
+    gameState = inGameState;
+
     return true;
+}
+
+void CRenderBoardGL::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        CRenderBoardGL* instance = static_cast<CRenderBoardGL*>(glfwGetWindowUserPointer(window));
+        if (instance != nullptr && instance->gameState != nullptr)
+        {
+            instance->gameState->HandleMouseClick(xpos, ypos);
+        }
+    }
 }
 
 GLuint CRenderBoardGL::LoadTexture(const char* filepath) 
@@ -280,7 +307,6 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
 
     for (int row = board->GetBoardSize() - 1; row >= 0; row--)
     {
-
         for (int col = 0; col < board->GetBoardSize(); col++)
         {
             const ECheckerType value = board->GetValueAt(row, col);
@@ -301,7 +327,6 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
 
 void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture)
 {
-
     glBindVertexArray(CheckerVAO);
 
     glActiveTexture(GL_TEXTURE0);
