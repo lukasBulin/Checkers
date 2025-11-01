@@ -25,7 +25,7 @@ void CRenderBoardConsole::RenderCheckerBoard(const CCheckerBoard* board)
 
 			switch (value)
 			{
-			case ECheckerType::white:
+			case ECheckerType::red:
 				cout << "o";
 				break;
 			case ECheckerType::black:

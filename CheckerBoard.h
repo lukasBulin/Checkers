@@ -5,7 +5,7 @@ class CPlayerInput;
 
 enum ECheckerType 
 {
-	white,
+	red,
 	black,
 	none
 };
@@ -25,6 +25,8 @@ public:
 
 	bool ValidateMove(SNextMove& nextMove) const;
 	void MoveChecker(const SNextMove& nextMove);
+
+	bool IsValidPosition(int row, int col, ECheckerType playerSide) const;
 
 private:
 

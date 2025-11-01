@@ -193,13 +193,14 @@ bool CRenderBoardGL::CreateWindow(CGameState* inGameState)
         return false;
     }
 
-    window = glfwCreateWindow(800, 800, "Sprite Example", nullptr, nullptr);
+    window = glfwCreateWindow(windowWidth, windowHeight, "Sprite Example", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
         return false;
     }
 
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetWindowUserPointer(window, this); // So we can access the instance in the static callback
 
@@ -224,10 +225,25 @@ void CRenderBoardGL::MouseButtonCallback(GLFWwindow* window, int button, int act
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
 
+        int windowWidth, windowHeight;
+        glfwGetWindowSize(window, &windowWidth, &windowHeight);
+
+        // Flip Y to match OpenGL's bottom-left origin
+        ypos = windowHeight - ypos;
+
+        // Swap X and Y if needed
+        double correctedX = ypos;
+        double correctedY = xpos;
+
+        int squareSize = windowWidth / 8;
+
+        int boardX = static_cast<int>(correctedX / squareSize);
+        int boardY = static_cast<int>(correctedY / squareSize);
+
         CRenderBoardGL* instance = static_cast<CRenderBoardGL*>(glfwGetWindowUserPointer(window));
         if (instance != nullptr && instance->gameState != nullptr)
         {
-            instance->gameState->HandleMouseClick(xpos, ypos);
+            instance->gameState->HandleMouseClick(boardX, boardY);
         }
     }
 }
@@ -313,7 +329,7 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
 
             switch (value)
             {
-            case ECheckerType::white:
+            case ECheckerType::red:
                 RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture);
                 break;
             case ECheckerType::black:

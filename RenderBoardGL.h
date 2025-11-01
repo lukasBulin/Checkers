@@ -54,4 +54,7 @@ private:
 	GLuint boardTexture = 0;
 	GLuint redCheckerTexture = 0;
 	GLuint blackCheckerTexture = 0;
+
+	int windowWidth = 800;
+	int windowHeight = 800;
 };

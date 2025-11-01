@@ -12,9 +12,11 @@ int main() {
 	CCheckerBoard board;
 	//CRenderBoardConsole render;
 	CRenderBoardGL render;
-	CPlayerInput playerWhite;
-	CPlayerInput playerBlack;
+	//CPlayerInput playerWhite;
+	//CPlayerInput playerBlack;
 	CGameState gameState;
+
+	gameState.SetBoard(&board);
 
 	if (!render.CreateWindow(&gameState))
 	{

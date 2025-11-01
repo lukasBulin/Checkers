@@ -1,11 +1,25 @@
 #include "GameState.h"
+#include "CheckerBoard.h"
 
 void CGameState::HandleMouseClick(int row, int col)
 {
-	// Convert screen coordinates to board coordinates
-	//int boardX = static_cast<int>(xpos / (800 / 8)); // assuming 8x8 board
-	//int boardY = static_cast<int>(ypos / (800 / 8));
+	//player selects start checker
+	if (playerAction == EPlayerAction::SelectStartChecker)
+	{
+		if (board->IsValidPosition(row, col, activePlayer))
+		{
+			playerAction = EPlayerAction::SelectEndPosition;
+		}
+	}
+	else if (playerAction == EPlayerAction::SelectEndPosition)
+	{
 
+	}
+	
+	
+	
+	
+	
 	//if (!IsValidPosition(boardY, boardX, currentBoard)) {
 	//    isCheckerSelected = false;
 	//    return;
@@ -32,4 +46,9 @@ void CGameState::HandleMouseClick(int row, int col)
 	//    isCheckerSelected = false;
 
 	//}
+}
+
+void CGameState::SetBoard(CCheckerBoard* inBoard)
+{
+	board = inBoard;
 }

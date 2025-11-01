@@ -1,5 +1,6 @@
 #include "CheckerBoard.h"
 #include "PlayerInput.h"
+
 #include <iostream>
 #include <assert.h>
 using namespace std;
@@ -42,12 +43,12 @@ void CCheckerBoard::ResetBoard()
 			// white checkers (o), even row
 			if ((row <= 2) && (row % 2 == 0) && (col % 2 == 0))
 			{
-				board[row][col] = ECheckerType::white;
+				board[row][col] = ECheckerType::red;
 			}
 			// white checkers (o), odd row
 			else if ((row <= 2) && (row % 2 != 0) && (col % 2 != 0))
 			{
-				board[row][col] = ECheckerType::white;
+				board[row][col] = ECheckerType::red;
 			}
 
 			// black checkers (x), even row
@@ -91,7 +92,7 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	}
 
 	// white takes black
-	if (nextMove.checkerType == ECheckerType::white && nextMove.endRow == nextMove.startRow + 2)
+	if (nextMove.checkerType == ECheckerType::red && nextMove.endRow == nextMove.startRow + 2)
 	{
 		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow + 1][nextMove.startCol + 1] == ECheckerType::black)
 		{
@@ -112,13 +113,13 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	// black takes white
 	if (nextMove.checkerType == ECheckerType::black && nextMove.endRow == nextMove.startRow - 2)
 	{
-		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow - 1][nextMove.startCol + 1] == ECheckerType::white)
+		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow - 1][nextMove.startCol + 1] == ECheckerType::red)
 		{
 			nextMove.rowToDelete = nextMove.startRow - 1;
 			nextMove.colToDelete = nextMove.startCol + 1;
 			return true;
 		}
-		else if (nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow - 1][nextMove.startCol - 1] == ECheckerType::white)
+		else if (nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow - 1][nextMove.startCol - 1] == ECheckerType::red)
 		{
 			nextMove.rowToDelete = nextMove.startRow - 1;
 			nextMove.colToDelete = nextMove.startCol - 1;
@@ -129,7 +130,7 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	}
 
 	// white checker, row change by +1
-	if ((nextMove.checkerType == ECheckerType::white) && (nextMove.endRow - nextMove.startRow != 1))
+	if ((nextMove.checkerType == ECheckerType::red) && (nextMove.endRow - nextMove.startRow != 1))
 	{
 		return false;
 	}
@@ -161,4 +162,9 @@ void CCheckerBoard::MoveChecker(const SNextMove& nextMove)
 	{
 		SetValueAt(nextMove.rowToDelete, nextMove.colToDelete, ECheckerType::none);
 	}
+}
+
+bool CCheckerBoard::IsValidPosition(int row, int col, ECheckerType playerSide) const
+{
+	return row >= 0 && row < GetBoardSize() && col >= 0 && col < GetBoardSize() && playerSide == GetValueAt(row, col);
 }
