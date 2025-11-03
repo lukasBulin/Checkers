@@ -9,46 +9,40 @@ void CGameState::HandleMouseClick(int row, int col)
 		if (board->IsValidPosition(row, col, activePlayer))
 		{
 			playerAction = EPlayerAction::SelectEndPosition;
+			nextMove.startRow = row;
+			nextMove.startCol = col;
 		}
 	}
+	//player selects end position
 	else if (playerAction == EPlayerAction::SelectEndPosition)
 	{
+		nextMove.endRow = row;
+		nextMove.endCol = col;
+		nextMove.checkerType = activePlayer;
 
+		if (board->ValidateMove(nextMove))
+		{
+			board->MoveChecker(nextMove);
+			playerAction = EPlayerAction::SelectStartChecker;
+			activePlayer = activePlayer == ECheckerType::red ? ECheckerType::black : ECheckerType::red;
+		}
+		else if (board->IsValidPosition(row, col, activePlayer))
+		{
+			nextMove.startRow = row;
+			nextMove.startCol = col;
+		}
 	}
-	
-	
-	
-	
-	
-	//if (!IsValidPosition(boardY, boardX, currentBoard)) {
-	//    isCheckerSelected = false;
-	//    return;
-	//}
-
-	//if (!isCheckerSelected) {
-	//    // Select checker
-	//    selectedX = boardX;
-	//    selectedY = boardY;
-	//    isCheckerSelected = true;
-	//}
-	//else {
-	//    // Attempt to move
-	//    SNextMove move;
-	//    move.startRow = selectedY;
-	//    move.startCol = selectedX;
-	//    move.endRow = boardY;
-	//    move.endCol = boardX;
-
-	//    if (currentBoard->ValidateMove(move)) {
-	//        currentBoard->MoveChecker(move);
-	//    }
-
-	//    isCheckerSelected = false;
-
-	//}
 }
 
 void CGameState::SetBoard(CCheckerBoard* inBoard)
 {
 	board = inBoard;
+}
+
+bool CGameState::GetSelectedSquare(int& outRow, int& outCol) const
+{
+	outRow = nextMove.startRow;
+	outCol = nextMove.startCol;
+
+	return (outRow >= 0 && outCol >= 0 && outRow < 8 && outCol < 8);
 }

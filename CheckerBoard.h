@@ -13,7 +13,7 @@ enum ECheckerType
 class CCheckerBoard 
 {
 public:
-
+	
 	CCheckerBoard();
 
 	void ResetBoard();

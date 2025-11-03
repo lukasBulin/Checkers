@@ -25,7 +25,7 @@ private:
 
 	void RenderAllCheckers(const CCheckerBoard* board);
 
-	void RenderChecker(float x, float y, GLuint texture);
+	void RenderChecker(float x, float y, GLuint texture, bool isSelected);
 	
 	bool CompileShader(GLuint& shader, GLenum type, const char* source);
 	bool InitializeShaders();

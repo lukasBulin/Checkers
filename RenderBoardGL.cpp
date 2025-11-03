@@ -40,7 +40,8 @@ bool CRenderBoardGL::InitializeShaders()
 
         out vec2 TexCoord;
 
-        void main() {
+        void main() 
+        {
             gl_Position = uProjection * uTransform * vec4(aPos, 0.0, 1.0);
             TexCoord = aTexCoord;
         }
@@ -51,9 +52,19 @@ bool CRenderBoardGL::InitializeShaders()
         out vec4 FragColor;
         in vec2 TexCoord;
         uniform sampler2D uTexture;
+        
+        uniform bool u_IsSelected;
+        uniform vec4 u_HighlightColor;
+        
+        void main() 
+        {
+            vec4 baseColor = texture(uTexture, TexCoord);
 
-        void main() {
-            FragColor = texture(uTexture, TexCoord);
+            if (u_IsSelected) {
+                baseColor = mix(baseColor, u_HighlightColor, 0.5); // 50% blend
+            }
+
+            FragColor = baseColor;
         }
     )";
 
@@ -318,22 +329,25 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
 {
     //clear console
     system("cls");
-
     assert(board != nullptr);
+
+    int selectedRow, selectedCol;
+    bool hasSelected = gameState->GetSelectedSquare(selectedRow, selectedCol);
 
     for (int row = board->GetBoardSize() - 1; row >= 0; row--)
     {
         for (int col = 0; col < board->GetBoardSize(); col++)
         {
             const ECheckerType value = board->GetValueAt(row, col);
+            const bool isSelected = (hasSelected && row == selectedRow && col == selectedCol);
 
             switch (value)
             {
             case ECheckerType::red:
-                RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture);
+                RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture, isSelected);
                 break;
             case ECheckerType::black:
-                RenderChecker(col * 100 + 10, row * 100 + 10, blackCheckerTexture);
+                RenderChecker(col * 100 + 10, row * 100 + 10, blackCheckerTexture, isSelected);
                 break;
 
             }
@@ -341,18 +355,25 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
     }
 }
 
-void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture)
+void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture, bool isSelected)
 {
+    glUseProgram(shaderProgram);
     glBindVertexArray(CheckerVAO);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
+    // Set projection matrix
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+    // Set transform matrix
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
+
+    // Set selection highlight uniforms
+    glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), isSelected ? 1 : 0);
+    glUniform4f(glGetUniformLocation(shaderProgram, "u_HighlightColor"), 1.0f, 1.0f, 0.0f, 1.0f); // Yellow
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
