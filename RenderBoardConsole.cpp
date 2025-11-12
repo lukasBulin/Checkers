@@ -19,16 +19,16 @@ void CRenderBoardConsole::RenderCheckerBoard(const CCheckerBoard* board)
 
 		for (int col = 0; col < board->GetBoardSize(); col++)
 		{
-			const ECheckerType value = board->GetValueAt(row, col);
+			const ECheckerColor value = board->GetValueAt(row, col);
 
 			cout << "|";
 
 			switch (value)
 			{
-			case ECheckerType::red:
+			case ECheckerColor::red:
 				cout << "o";
 				break;
-			case ECheckerType::black:
+			case ECheckerColor::black:
 				cout << "x";
 				break;
 			default:

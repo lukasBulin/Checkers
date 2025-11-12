@@ -22,11 +22,11 @@ public:
 
 	std::vector<std::pair<int, int>> GetPotentialMoves() const;
 
-	void CalculatePotentialMoves(int row, int col, ECheckerType player);
+	void CalculatePotentialMoves(int row, int col, ECheckerColor player);
 
 private:
 
-	ECheckerType activePlayer = ECheckerType::red;
+	ECheckerColor activePlayer = ECheckerColor::red;
 	EPlayerAction playerAction = SelectStartChecker;
 	CCheckerBoard* board = nullptr;
 	SNextMove nextMove;

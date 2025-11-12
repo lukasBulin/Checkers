@@ -13,7 +13,7 @@ struct SNextMove
 	int endCol = invalidCoordinate;
 	int endRow = invalidCoordinate;
 
-	ECheckerType checkerType = ECheckerType::none;
+	ECheckerColor checkerType = ECheckerColor::none;
 
 	int colToDelete = invalidCoordinate;
 	int rowToDelete = invalidCoordinate;
@@ -22,7 +22,7 @@ struct SNextMove
 	{
 		return startCol != invalidCoordinate && startRow != invalidCoordinate
 			   && endCol != invalidCoordinate && endRow != invalidCoordinate
-			   && checkerType != ECheckerType::none;
+			   && checkerType != ECheckerColor::none;
 	}
 };
 

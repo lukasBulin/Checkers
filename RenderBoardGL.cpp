@@ -56,17 +56,10 @@ bool CRenderBoardGL::InitializeShaders()
         
         uniform bool u_IsSelected;
         uniform vec4 u_HighlightColor;
-        
-        uniform bool u_IsHintDot;
-        uniform vec4 u_DotColor;
 
         void main() 
         {
             vec4 baseColor = texture(uTexture, TexCoord);
-
-            if (u_IsHintDot) {
-                baseColor = mix(baseColor, u_DotColor, 0.5); // 50% blend
-            }
 
             if (u_IsSelected) {
                 baseColor = mix(baseColor, u_HighlightColor, 0.5); // 50% blend
@@ -396,15 +389,15 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
     {
         for (int col = 0; col < board->GetBoardSize(); col++)
         {
-            const ECheckerType value = board->GetValueAt(row, col);
+            const ECheckerColor value = board->GetValueAt(row, col);
             const bool isSelected = (hasSelected && row == selectedRow && col == selectedCol);
 
             switch (value)
             {
-            case ECheckerType::red:
+            case ECheckerColor::red:
                 RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture, isSelected);
                 break;
-            case ECheckerType::black:
+            case ECheckerColor::black:
                 RenderChecker(col * 100 + 10, row * 100 + 10, blackCheckerTexture, isSelected);
                 break;
 
@@ -430,7 +423,6 @@ void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture, bool isSele
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
 
     // Set selection highlight uniforms
-  //glUniform1i(glGetUniformLocation(shaderProgram, "u_IsHintDot"), false);
     glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), isSelected ? 1 : 0);
     glUniform4f(glGetUniformLocation(shaderProgram, "u_HighlightColor"), 1.0f, 1.0f, 0.0f, 1.0f); // Yellow
 
@@ -452,11 +444,6 @@ void CRenderBoardGL::RenderHintDot(float x, float y, GLuint texture)
     // Set transform matrix (center the dot)
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x - 10.0f, y - 10.0f, 0.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
-
-    // Set hint dot uniforms
-  //glUniform1i(glGetUniformLocation(shaderProgram, "u_IsHintDot"), true);
-    glUniform4f(glGetUniformLocation(shaderProgram, "u_DotColor"), 0.5f, 0.5f, 0.5f, 1.0f); // grey
-  //glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), false); // not selected
 
     // No texture needed for hint dot
     glBindVertexArray(hintVAO);

@@ -26,8 +26,38 @@ void CGameState::HandleMouseClick(int row, int col)
 		if (board->ValidateMove(nextMove))
 		{
 			board->MoveChecker(nextMove);
+			
+			bool isCapture = abs(nextMove.endRow - nextMove.startRow) == 2;
+
+			if (isCapture)
+			{
+				// Recalculate potential moves for chaining
+				CalculatePotentialMoves(nextMove.endRow, nextMove.endCol, activePlayer);
+
+				// Filter only capture moves
+				for (auto it = potentialMoves.begin(); it != potentialMoves.end(); )
+				{
+					if (abs(nextMove.endRow - it->first) != 2 || abs(nextMove.endCol - it->second) != 2)
+					{
+						it = potentialMoves.erase(it); // erase returns next iterator
+					}
+					else
+					{
+						++it;
+					}
+				}
+				if (!potentialMoves.empty())
+				{
+					// Keep same player and allow chaining
+					nextMove.startRow = nextMove.endRow;
+					nextMove.startCol = nextMove.endCol;
+					return; // Exit early, don't switch turn
+				}
+
+			}
+			
 			playerAction = EPlayerAction::SelectStartChecker;
-			activePlayer = activePlayer == ECheckerType::red ? ECheckerType::black : ECheckerType::red;
+			activePlayer = activePlayer == ECheckerColor::red ? ECheckerColor::black : ECheckerColor::red;
 			potentialMoves.clear();
 		}
 		// if clicked from red to a different red or black to a different black
@@ -58,7 +88,7 @@ std::vector<std::pair<int, int>> CGameState::GetPotentialMoves() const
 	return potentialMoves;
 }
 
-void CGameState::CalculatePotentialMoves(int row, int col, ECheckerType player)
+void CGameState::CalculatePotentialMoves(int row, int col, ECheckerColor player)
 {
 	potentialMoves.clear();
 
@@ -67,7 +97,7 @@ void CGameState::CalculatePotentialMoves(int row, int col, ECheckerType player)
 	nMove.startCol = col;
 
 	// Determine direction based on player
-	const int direction = (player == ECheckerType::red) ? 1 : -1;
+	const int direction = (player == ECheckerColor::red) ? 1 : -1;
 	nMove.checkerType = player;
 
 	// Normal move: diagonal left

@@ -3,11 +3,17 @@
 struct SNextMove;
 class CPlayerInput;
 
-enum ECheckerType 
+enum ECheckerColor 
 {
 	red,
 	black,
 	none
+};
+
+enum ECheckerType
+{
+	pawn,
+	queen
 };
 
 class CCheckerBoard 
@@ -20,17 +26,17 @@ public:
 
 	int GetBoardSize() const;
 
-	ECheckerType GetValueAt(int row, int col) const;
-	void SetValueAt(int row, int col, ECheckerType value);
+	ECheckerColor GetValueAt(int row, int col) const;
+	void SetValueAt(int row, int col, ECheckerColor value);
 
 	bool ValidateMove(SNextMove& nextMove) const;
 	void MoveChecker(const SNextMove& nextMove);
 
-	bool IsValidPosition(int row, int col, ECheckerType playerSide) const;
+	bool IsValidPosition(int row, int col, ECheckerColor playerSide) const;
 
 private:
 
 	static const int boardSize = 8;
 
-	ECheckerType board[boardSize][boardSize];
+	ECheckerColor board[boardSize][boardSize];
 };

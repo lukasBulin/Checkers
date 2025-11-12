@@ -11,7 +11,7 @@ CCheckerBoard::CCheckerBoard()
 	{
 		for (int col = 0; col < boardSize; col++)
 		{
-			board[row][col] = ECheckerType::none;
+			board[row][col] = ECheckerColor::none;
 		}
 	}
 }
@@ -21,13 +21,13 @@ int CCheckerBoard::GetBoardSize() const
 	return boardSize;
 }
 
-ECheckerType CCheckerBoard::GetValueAt(int row, int col) const
+ECheckerColor CCheckerBoard::GetValueAt(int row, int col) const
 {
 	assert(row >= 0 && col >= 0 && row < boardSize && col < boardSize);
 	return board[row][col];
 }
 
-void CCheckerBoard::SetValueAt(int row, int col, ECheckerType value)
+void CCheckerBoard::SetValueAt(int row, int col, ECheckerColor value)
 {
 	assert(row >= 0 && col >= 0 && row < boardSize && col < boardSize);
 	
@@ -43,23 +43,23 @@ void CCheckerBoard::ResetBoard()
 			// white checkers (o), even row
 			if ((row <= 2) && (row % 2 == 0) && (col % 2 == 0))
 			{
-				board[row][col] = ECheckerType::red;
+				board[row][col] = ECheckerColor::red;
 			}
 			// white checkers (o), odd row
 			else if ((row <= 2) && (row % 2 != 0) && (col % 2 != 0))
 			{
-				board[row][col] = ECheckerType::red;
+				board[row][col] = ECheckerColor::red;
 			}
 
 			// black checkers (x), even row
 			if ((row >= 5 && row <= 7) && (row % 2 == 0) && (col % 2 == 0))
 			{
-				board[row][col] = ECheckerType::black;
+				board[row][col] = ECheckerColor::black;
 			}
 			// black checkers (x), odd row
 			else if ((row >= 5 && row <= 7) && (row % 2 != 0) && (col % 2 != 0))
 			{
-				board[row][col] = ECheckerType::black;
+				board[row][col] = ECheckerColor::black;
 			}
 		}
 	}
@@ -74,7 +74,7 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	}
 
 	// ending cordinates are not on an open tile
-	if (board[nextMove.endRow][nextMove.endCol] != ECheckerType::none)
+	if (board[nextMove.endRow][nextMove.endCol] != ECheckerColor::none)
 	{
 		return false;
 	}
@@ -92,15 +92,15 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	}
 
 	// white takes black
-	if (nextMove.checkerType == ECheckerType::red && nextMove.endRow == nextMove.startRow + 2)
+	if (nextMove.checkerType == ECheckerColor::red && nextMove.endRow == nextMove.startRow + 2)
 	{
-		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow + 1][nextMove.startCol + 1] == ECheckerType::black)
+		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow + 1][nextMove.startCol + 1] == ECheckerColor::black)
 		{
 			nextMove.rowToDelete = nextMove.startRow + 1;
 			nextMove.colToDelete = nextMove.startCol + 1;
 			return true;
 		}
-		else if	(nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow + 1][nextMove.startCol - 1] == ECheckerType::black)
+		else if	(nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow + 1][nextMove.startCol - 1] == ECheckerColor::black)
 		{
 			nextMove.rowToDelete = nextMove.startRow + 1;
 			nextMove.colToDelete = nextMove.startCol - 1;
@@ -111,15 +111,15 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	}
 
 	// black takes white
-	if (nextMove.checkerType == ECheckerType::black && nextMove.endRow == nextMove.startRow - 2)
+	if (nextMove.checkerType == ECheckerColor::black && nextMove.endRow == nextMove.startRow - 2)
 	{
-		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow - 1][nextMove.startCol + 1] == ECheckerType::red)
+		if (nextMove.endCol == nextMove.startCol + 2 && board[nextMove.startRow - 1][nextMove.startCol + 1] == ECheckerColor::red)
 		{
 			nextMove.rowToDelete = nextMove.startRow - 1;
 			nextMove.colToDelete = nextMove.startCol + 1;
 			return true;
 		}
-		else if (nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow - 1][nextMove.startCol - 1] == ECheckerType::red)
+		else if (nextMove.endCol == nextMove.startCol - 2 && board[nextMove.startRow - 1][nextMove.startCol - 1] == ECheckerColor::red)
 		{
 			nextMove.rowToDelete = nextMove.startRow - 1;
 			nextMove.colToDelete = nextMove.startCol - 1;
@@ -130,13 +130,13 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 	}
 
 	// white checker, row change by +1
-	if ((nextMove.checkerType == ECheckerType::red) && (nextMove.endRow - nextMove.startRow != 1))
+	if ((nextMove.checkerType == ECheckerColor::red) && (nextMove.endRow - nextMove.startRow != 1))
 	{
 		return false;
 	}
 
 	// black checker, row change by -1
-	if ((nextMove.checkerType == ECheckerType::black) && (nextMove.endRow - nextMove.startRow != -1))
+	if ((nextMove.checkerType == ECheckerColor::black) && (nextMove.endRow - nextMove.startRow != -1))
 	{
 		return false;
 	}
@@ -152,19 +152,19 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 
 void CCheckerBoard::MoveChecker(const SNextMove& nextMove)
 {
-	ECheckerType checkerType = GetValueAt(nextMove.startRow, nextMove.startCol);
+	ECheckerColor checkerType = GetValueAt(nextMove.startRow, nextMove.startCol);
 
 	SetValueAt(nextMove.endRow, nextMove.endCol, checkerType);
 
-	SetValueAt(nextMove.startRow, nextMove.startCol, ECheckerType::none);
+	SetValueAt(nextMove.startRow, nextMove.startCol, ECheckerColor::none);
 
 	if (nextMove.rowToDelete != SNextMove::invalidCoordinate && nextMove.colToDelete != SNextMove::invalidCoordinate)
 	{
-		SetValueAt(nextMove.rowToDelete, nextMove.colToDelete, ECheckerType::none);
+		SetValueAt(nextMove.rowToDelete, nextMove.colToDelete, ECheckerColor::none);
 	}
 }
 
-bool CCheckerBoard::IsValidPosition(int row, int col, ECheckerType playerSide) const
+bool CCheckerBoard::IsValidPosition(int row, int col, ECheckerColor playerSide) const
 {
 	return row >= 0 && row < GetBoardSize() && col >= 0 && col < GetBoardSize() && playerSide == GetValueAt(row, col);
 }
