@@ -24,14 +24,15 @@ private:
 	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 	void RenderAllCheckers(const CCheckerBoard* board);
-
 	void RenderChecker(float x, float y, GLuint texture, bool isSelected);
+	void RenderHintDot(float x, float y, GLuint texture);
 	
 	bool CompileShader(GLuint& shader, GLenum type, const char* source);
 	bool InitializeShaders();
 
 	void SetupBoardGeometry();
-	void SetupRedCheckerGeometry();
+	void SetupCheckerGeometry();
+	void SetupHintDotGeometry();
 
 	virtual bool InitializeRender() override;
 	GLuint LoadTexture(const char* filepath);
@@ -46,14 +47,20 @@ private:
 	GLuint boardVBO = 0;
 	GLuint boardEBO = 0;
 
-	//redChecker VAOs
+	//Checker VAOs
 	GLuint CheckerVAO = 0;
 	GLuint CheckerVBO = 0;
 	GLuint CheckerEBO = 0;
 
+	//HintDot VAOs
+	GLuint hintVAO = 0;
+	GLuint hintVBO = 0;
+	GLuint hintEBO = 0;
+
 	GLuint boardTexture = 0;
 	GLuint redCheckerTexture = 0;
 	GLuint blackCheckerTexture = 0;
+	GLuint hintDotTexture = 0;
 
 	int windowWidth = 800;
 	int windowHeight = 800;

@@ -49,16 +49,24 @@ bool CRenderBoardGL::InitializeShaders()
 
     const char* fragmentShaderSource = R"(
         #version 330 core
-        out vec4 FragColor;
         in vec2 TexCoord;
+        out vec4 FragColor;
+
         uniform sampler2D uTexture;
         
         uniform bool u_IsSelected;
         uniform vec4 u_HighlightColor;
         
+        uniform bool u_IsHintDot;
+        uniform vec4 u_DotColor;
+
         void main() 
         {
             vec4 baseColor = texture(uTexture, TexCoord);
+
+            if (u_IsHintDot) {
+                baseColor = mix(baseColor, u_DotColor, 0.5); // 50% blend
+            }
 
             if (u_IsSelected) {
                 baseColor = mix(baseColor, u_HighlightColor, 0.5); // 50% blend
@@ -127,7 +135,7 @@ void CRenderBoardGL::SetupBoardGeometry()
     glBindVertexArray(0);
 }
 
-void CRenderBoardGL::SetupRedCheckerGeometry()
+void CRenderBoardGL::SetupCheckerGeometry()
 {
     float vertices[] = {
         // positions     // tex coords
@@ -163,6 +171,46 @@ void CRenderBoardGL::SetupRedCheckerGeometry()
     glBindVertexArray(0);
 }
 
+void CRenderBoardGL::SetupHintDotGeometry()
+{
+    float vertices[] = {
+        // positions      // texture coords
+        0.0f, 0.0f,       0.0f, 0.0f,
+        20.0f, 0.0f,      1.0f, 0.0f,
+        20.0f, 20.0f,     1.0f, 1.0f,
+        0.0f, 20.0f,      0.0f, 1.0f
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+
+    glGenVertexArrays(1, &hintVAO);
+    glGenBuffers(1, &hintVBO);
+    glGenBuffers(1, &hintEBO);
+
+    glBindVertexArray(hintVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, hintVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hintEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Texture coordinate attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+
+}
+
 bool CRenderBoardGL::InitializeRender() 
 {
     glfwMakeContextCurrent(window);
@@ -177,7 +225,8 @@ bool CRenderBoardGL::InitializeRender()
     if (!InitializeShaders()) return false;
 
     SetupBoardGeometry();
-    SetupRedCheckerGeometry();
+    SetupCheckerGeometry();
+    SetupHintDotGeometry();
 
     //board Texture
     boardTexture = LoadTexture("Images/CheckerBoard.jpg");
@@ -194,6 +243,11 @@ bool CRenderBoardGL::InitializeRender()
     if (blackCheckerTexture == 0)
         return false;
 
+    //hintDot Texture
+    hintDotTexture = LoadTexture("Images/HintDot.png");
+    if (hintDotTexture == 0)
+        return false;
+
     return true;
 }
 
@@ -204,7 +258,7 @@ bool CRenderBoardGL::CreateWindow(CGameState* inGameState)
         return false;
     }
 
-    window = glfwCreateWindow(windowWidth, windowHeight, "Sprite Example", nullptr, nullptr);
+    window = glfwCreateWindow(windowWidth, windowHeight, "Checkers", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -300,7 +354,6 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board)
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-
     glBindVertexArray(boardVAO);
 
     glActiveTexture(GL_TEXTURE0);
@@ -318,8 +371,13 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board)
 
     RenderAllCheckers(board);
 
-    //RenderChecker(100.0f, 100.0f); // Example position
-    //RenderChecker(300.f, 300.f);
+    //draw hint dots
+    for (const auto& hint : gameState->GetPotentialMoves())
+    {
+        float x = hint.second * 100 + 50; // center of tile
+        float y = hint.first * 100 + 50;
+        RenderHintDot(x, y, hintDotTexture);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -372,11 +430,37 @@ void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture, bool isSele
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
 
     // Set selection highlight uniforms
+  //glUniform1i(glGetUniformLocation(shaderProgram, "u_IsHintDot"), false);
     glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), isSelected ? 1 : 0);
     glUniform4f(glGetUniformLocation(shaderProgram, "u_HighlightColor"), 1.0f, 1.0f, 0.0f, 1.0f); // Yellow
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+    glBindVertexArray(0);
+}
+
+void CRenderBoardGL::RenderHintDot(float x, float y, GLuint texture)
+{
+    glUseProgram(shaderProgram);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // Set projection matrix
+    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Set transform matrix (center the dot)
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x - 10.0f, y - 10.0f, 0.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
+
+    // Set hint dot uniforms
+  //glUniform1i(glGetUniformLocation(shaderProgram, "u_IsHintDot"), true);
+    glUniform4f(glGetUniformLocation(shaderProgram, "u_DotColor"), 0.5f, 0.5f, 0.5f, 1.0f); // grey
+  //glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), false); // not selected
+
+    // No texture needed for hint dot
+    glBindVertexArray(hintVAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
