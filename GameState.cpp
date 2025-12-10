@@ -20,7 +20,7 @@ void CGameState::HandleMouseClick(int row, int col)
 	{
 		nextMove.endRow = row;
 		nextMove.endCol = col;
-		nextMove.checkerType = activePlayer;
+		nextMove.checkerColor = activePlayer;
 
 		//if clicked correct move, switch to black
 		if (board->ValidateMove(nextMove))
@@ -98,7 +98,7 @@ void CGameState::CalculatePotentialMoves(int row, int col, ECheckerColor player)
 
 	// Determine direction based on player
 	const int direction = (player == ECheckerColor::red) ? 1 : -1;
-	nMove.checkerType = player;
+	nMove.checkerColor = player;
 
 	// Normal move: diagonal left
 	nMove.endRow = row + direction;

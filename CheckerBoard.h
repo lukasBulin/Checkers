@@ -7,13 +7,20 @@ enum ECheckerColor
 {
 	red,
 	black,
-	none
+	noColor
 };
 
 enum ECheckerType
 {
 	pawn,
-	queen
+	queen,
+	noType
+};
+
+struct SChecker
+{
+	ECheckerColor color = ECheckerColor::noColor;
+	ECheckerType type = ECheckerType::noType;
 };
 
 class CCheckerBoard 
@@ -38,5 +45,5 @@ private:
 
 	static const int boardSize = 8;
 
-	ECheckerColor board[boardSize][boardSize];
+	SChecker board[boardSize][boardSize];
 };

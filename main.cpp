@@ -42,7 +42,7 @@ int main() {
 
 		//SNextMove nextMove = whiteTurn ? playerWhite.ProcessPlayerInput(&board) : playerBlack.ProcessPlayerInput(&board);
 
-		//nextMove.checkerType = whiteTurn ? ECheckerColor::white : ECheckerColor::black;
+		//nextMove.checkerColor = whiteTurn ? ECheckerColor::white : ECheckerColor::black;
 
 		//if (board.ValidateMove(nextMove))
 		//{
