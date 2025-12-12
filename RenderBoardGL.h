@@ -61,6 +61,8 @@ private:
 	GLuint redCheckerTexture = 0;
 	GLuint blackCheckerTexture = 0;
 	GLuint hintDotTexture = 0;
+	GLuint redQueenCheckerTexture = 0;
+	GLuint blackQueenCheckerTexture = 0;
 
 	int windowWidth = 800;
 	int windowHeight = 800;

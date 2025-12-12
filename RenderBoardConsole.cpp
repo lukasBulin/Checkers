@@ -19,7 +19,7 @@ void CRenderBoardConsole::RenderCheckerBoard(const CCheckerBoard* board)
 
 		for (int col = 0; col < board->GetBoardSize(); col++)
 		{
-			const ECheckerColor value = board->GetValueAt(row, col);
+			const ECheckerColor value = board->GetColorAt(row, col);
 
 			cout << "|";
 

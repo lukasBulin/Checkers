@@ -19,6 +19,11 @@ enum ECheckerType
 
 struct SChecker
 {
+	SChecker(ECheckerColor inColor, ECheckerType inType)
+		: color(inColor)
+		, type(inType)
+	{}
+
 	ECheckerColor color = ECheckerColor::noColor;
 	ECheckerType type = ECheckerType::noType;
 };
@@ -33,8 +38,8 @@ public:
 
 	int GetBoardSize() const;
 
-	ECheckerColor GetValueAt(int row, int col) const;
-	void SetValueAt(int row, int col, ECheckerColor value);
+	SChecker GetCheckerAt(int row, int col) const;
+	void SetCheckerAt(int row, int col, const SChecker& checker);
 
 	bool ValidateMove(SNextMove& nextMove) const;
 	void MoveChecker(const SNextMove& nextMove);

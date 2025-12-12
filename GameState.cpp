@@ -12,6 +12,8 @@ void CGameState::HandleMouseClick(int row, int col)
 			nextMove.startRow = row;
 			nextMove.startCol = col;
 
+			nextMove.checkerType = board->GetTypeAt(row, col); // check piece type
+
 			CalculatePotentialMoves(row, col, activePlayer);
 		}
 	}
@@ -95,38 +97,123 @@ void CGameState::CalculatePotentialMoves(int row, int col, ECheckerColor player)
 	SNextMove nMove;
 	nMove.startRow = row;
 	nMove.startCol = col;
-
-	// Determine direction based on player
-	const int direction = (player == ECheckerColor::red) ? 1 : -1;
 	nMove.checkerColor = player;
 
-	// Normal move: diagonal left
-	nMove.endRow = row + direction;
-	nMove.endCol = col - 1;
-	if (board->ValidateMove(nMove))
+	// check the piece type
+	ECheckerType pieceType = board->GetTypeAt(row, col);
+	// assign the piece type
+	nMove.checkerType = pieceType;
+
+	// pawn logic
+	if (pieceType == ECheckerType::pawn)
 	{
-		potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
+		// Determine direction based on player
+		const int direction = (player == ECheckerColor::red) ? 1 : -1;
+
+		// Normal move: diagonal left
+		nMove.endRow = row + direction;
+		nMove.endCol = col - 1;
+		if (board->ValidateMove(nMove))
+		{
+			potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
+		}
+
+		// Normal move: diagonal right
+		nMove.endCol = col + 1;
+		if (board->ValidateMove(nMove))
+		{
+			potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
+		}
+
+		// Capture move: diagonal left
+		nMove.endRow = row + 2 * direction;
+		nMove.endCol = col - 2;
+		if (board->ValidateMove(nMove))
+		{
+			potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
+		}
+
+		// Capture move: diagonal right
+		nMove.endCol = col + 2;
+		if (board->ValidateMove(nMove))
+		{
+			potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
+		}
+
+		return;
 	}
 
-	// Normal move: diagonal right
-	nMove.endCol = col + 1;
-	if (board->ValidateMove(nMove))
+	// queen logic
+	if (pieceType == ECheckerType::queen)
 	{
-		potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
-	}
+		// All 4 diagonal directions
+		const int directions[4][2] =
+		{
+			{ 1,  1},   // up-right
+			{ 1, -1},   // up-left
+			{-1,  1},   // down-right
+			{-1, -1}    // down-left
+		};
 
-	// Capture move: diagonal left
-	nMove.endRow = row + 2 * direction;
-	nMove.endCol = col - 2;
-	if (board->ValidateMove(nMove))
-	{
-		potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
-	}
+		for (auto& d : directions)
+		{
+			int r = row + d[0];
+			int c = col + d[1];
 
-	// Capture move: diagonal right
-	nMove.endCol = col + 2;
-	if (board->ValidateMove(nMove))
-	{
-		potentialMoves.emplace_back(nMove.endRow, nMove.endCol);
+			bool foundEnemy = false;
+			int enemyRow = -1;
+			int enemyCol = -1;
+
+			while (r >= 0 && r < 8 && c >= 0 && c < 8)
+			{
+				// OWN piece blocks everything
+				if (board->GetColorAt(r, c) == player)
+					break;
+
+				// Empty square
+				if (board->GetColorAt(r, c) == ECheckerColor::noColor)
+				{
+					if (!foundEnemy)
+					{
+						// Normal slide
+						nMove.endRow = r;
+						nMove.endCol = c;
+						if (board->ValidateMove(nMove))
+							potentialMoves.emplace_back(r, c);
+					}
+					else
+					{
+						// Landing after capture
+						nMove.endRow = r;
+						nMove.endCol = c;
+						if (board->ValidateMove(nMove))
+							potentialMoves.emplace_back(r, c);
+
+						// Can't keep jumping after the capture
+						break;
+					}
+				}
+				else
+				{
+					// Enemy piece
+					if (!foundEnemy)
+					{
+						foundEnemy = true;
+						enemyRow = r;
+						enemyCol = c;
+					}
+					else
+					{
+						// Two enemies ? blocked
+						break;
+					}
+				}
+
+				r += d[0];
+				c += d[1];
+			}
+		}
+
+		return;
 	}
 }

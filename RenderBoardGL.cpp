@@ -241,6 +241,16 @@ bool CRenderBoardGL::InitializeRender()
     if (hintDotTexture == 0)
         return false;
 
+    stbi_set_flip_vertically_on_load(true);
+    redQueenCheckerTexture = LoadTexture("Images/CheckerPieceRedQueen.png");
+    if (redQueenCheckerTexture == 0)
+        return false;
+
+    //stbi_set_flip_vertically_on_load(true);
+    blackQueenCheckerTexture = LoadTexture("Images/CheckerPieceBlackQueen.png");
+    if (blackQueenCheckerTexture == 0)
+        return false;
+
     return true;
 }
 
@@ -389,16 +399,32 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
     {
         for (int col = 0; col < board->GetBoardSize(); col++)
         {
-            const ECheckerColor value = board->GetValueAt(row, col);
+            const ECheckerColor color = board->GetColorAt(row, col);
+            const ECheckerType type = board->GetTypeAt(row, col);
             const bool isSelected = (hasSelected && row == selectedRow && col == selectedCol);
 
-            switch (value)
+            switch (color)
             {
             case ECheckerColor::red:
-                RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture, isSelected);
+                if (type == ECheckerType::queen)
+                {
+                    RenderChecker(col * 100 + 10, row * 100 + 10, redQueenCheckerTexture, isSelected);
+                }
+                else
+                {
+                    RenderChecker(col * 100 + 10, row * 100 + 10, redCheckerTexture, isSelected);
+                }
                 break;
+
             case ECheckerColor::black:
-                RenderChecker(col * 100 + 10, row * 100 + 10, blackCheckerTexture, isSelected);
+                if (type == ECheckerType::queen)
+                {
+                    RenderChecker(col * 100 + 10, row * 100 + 10, blackQueenCheckerTexture, isSelected);
+                }
+                else
+                {
+                    RenderChecker(col * 100 + 10, row * 100 + 10, blackCheckerTexture, isSelected);
+                }
                 break;
 
             }
