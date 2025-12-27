@@ -399,14 +399,15 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
     {
         for (int col = 0; col < board->GetBoardSize(); col++)
         {
-            const ECheckerColor color = board->GetColorAt(row, col);
-            const ECheckerType type = board->GetTypeAt(row, col);
+            /*const ECheckerColor color = board->GetColorAt(row, col);
+            const ECheckerType type = board->GetTypeAt(row, col);*/
+            const SChecker value = board->GetCheckerAt(row, col);
             const bool isSelected = (hasSelected && row == selectedRow && col == selectedCol);
 
-            switch (color)
+            switch (value.color)
             {
             case ECheckerColor::red:
-                if (type == ECheckerType::queen)
+                if (value.type == ECheckerType::queen)
                 {
                     RenderChecker(col * 100 + 10, row * 100 + 10, redQueenCheckerTexture, isSelected);
                 }
@@ -417,7 +418,7 @@ void CRenderBoardGL::RenderAllCheckers(const CCheckerBoard* board)
                 break;
 
             case ECheckerColor::black:
-                if (type == ECheckerType::queen)
+                if (value.type == ECheckerType::queen)
                 {
                     RenderChecker(col * 100 + 10, row * 100 + 10, blackQueenCheckerTexture, isSelected);
                 }

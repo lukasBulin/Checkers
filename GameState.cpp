@@ -12,7 +12,9 @@ void CGameState::HandleMouseClick(int row, int col)
 			nextMove.startRow = row;
 			nextMove.startCol = col;
 
-			nextMove.checkerType = board->GetTypeAt(row, col); // check piece type
+			//nextMove.checkerType = board->GetTypeAt(row, col); // check piece type
+
+			nextMove.checkerType = board->GetCheckerAt(row, col).type;
 
 			CalculatePotentialMoves(row, col, activePlayer);
 		}
@@ -100,7 +102,8 @@ void CGameState::CalculatePotentialMoves(int row, int col, ECheckerColor player)
 	nMove.checkerColor = player;
 
 	// check the piece type
-	ECheckerType pieceType = board->GetTypeAt(row, col);
+	const ECheckerType pieceType = board->GetCheckerAt(row, col).type;
+	//ECheckerType pieceType = board->GetTypeAt(row, col);
 	// assign the piece type
 	nMove.checkerType = pieceType;
 
@@ -166,13 +169,24 @@ void CGameState::CalculatePotentialMoves(int row, int col, ECheckerColor player)
 
 			while (r >= 0 && r < 8 && c >= 0 && c < 8)
 			{
+				//// OWN piece blocks everything
+				//if (board->GetColorAt(r, c) == player)
+				//	break;
+
+				//// Empty square
+				//if (board->GetColorAt(r, c) == ECheckerColor::noColor)
+				//{
+
+				const ECheckerColor atColor = board->GetCheckerAt(r, c).color;
+
 				// OWN piece blocks everything
-				if (board->GetColorAt(r, c) == player)
+				if (atColor == player)
 					break;
 
 				// Empty square
-				if (board->GetColorAt(r, c) == ECheckerColor::noColor)
+				if (atColor == ECheckerColor::noColor)
 				{
+
 					if (!foundEnemy)
 					{
 						// Normal slide

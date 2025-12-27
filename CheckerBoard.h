@@ -19,6 +19,8 @@ enum ECheckerType
 
 struct SChecker
 {
+	SChecker() = default;
+
 	SChecker(ECheckerColor inColor, ECheckerType inType)
 		: color(inColor)
 		, type(inType)
