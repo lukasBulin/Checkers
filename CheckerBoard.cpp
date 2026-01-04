@@ -34,30 +34,6 @@ void CCheckerBoard::SetCheckerAt(int row, int col, const SChecker& checker)
 	board[row][col] = checker;
 }
 
-//ECheckerColor CCheckerBoard::GetColorAt(int row, int col) const
-//{
-//	assert(row >= 0 && col >= 0 && row < boardSize && col < boardSize);
-//	return board[row][col].color;
-//}
-//
-//void CCheckerBoard::SetColorAt(int row, int col, ECheckerColor color)
-//{
-//	assert(row >= 0 && col >= 0 && row < boardSize && col < boardSize);
-//	board[row][col].color = color;
-//}
-//
-//ECheckerType CCheckerBoard::GetTypeAt(int row, int col) const
-//{
-//	assert(row >= 0 && col >= 0 && row < boardSize && col < boardSize);
-//	return board[row][col].type;
-//}
-//
-//void CCheckerBoard::SetTypeAt(int row, int col, ECheckerType type)
-//{
-//	assert(row >= 0 && col >= 0 && row < boardSize && col < boardSize);
-//	board[row][col].type = type;
-//}
-
 void CCheckerBoard::ResetBoard()
 {
 	for (int row = 0; row < boardSize; row++)
@@ -98,8 +74,11 @@ void CCheckerBoard::ResetBoard()
 
 bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 {
+	nextMove.rowToDelete = SNextMove::invalidCoordinate;
+	nextMove.colToDelete = SNextMove::invalidCoordinate;
+
 	// pawn rules
-	if (nextMove.checkerType == ECheckerType::pawn)
+ 	if (nextMove.checkerType == ECheckerType::pawn)
 	{
 		// starting cordinates are not on a checker
 		if (board[nextMove.startRow][nextMove.startCol].color != nextMove.checkerColor)
@@ -260,7 +239,6 @@ bool CCheckerBoard::ValidateMove(SNextMove& nextMove) const
 
 void CCheckerBoard::MoveChecker(const SNextMove& nextMove)
 {
-
 	// Get the checker from the starting position
 	SChecker moving = GetCheckerAt(nextMove.startRow, nextMove.startCol);
 
@@ -289,43 +267,6 @@ void CCheckerBoard::MoveChecker(const SNextMove& nextMove)
 			SetCheckerAt(nextMove.endRow, nextMove.endCol, moving);
 		}
 	}
-
-
-	//ECheckerColor checkerColor = GetColorAt(nextMove.startRow, nextMove.startCol);
-	//ECheckerType checkerType = GetTypeAt(nextMove.startRow, nextMove.startCol);
-
-	//// move piece at new spot
-	//SetColorAt(nextMove.endRow, nextMove.endCol, checkerColor);
-	//SetTypeAt(nextMove.endRow, nextMove.endCol, checkerType);
-
-	//// clear old spot
-	//SetColorAt(nextMove.startRow, nextMove.startCol, ECheckerColor::noColor);
-	//SetTypeAt(nextMove.startRow, nextMove.startCol, ECheckerType::noType);
-
-	//// delete captured piece (color and type)
-	//if (nextMove.rowToDelete != SNextMove::invalidCoordinate && nextMove.colToDelete != SNextMove::invalidCoordinate)
-	//{
-	//	SetColorAt(nextMove.rowToDelete, nextMove.colToDelete, ECheckerColor::noColor);
-	//	SetTypeAt(nextMove.rowToDelete, nextMove.colToDelete, ECheckerType::noType);
-	//}
-
-	//// make a PROMOTION if there is one to be made
-	//if (checkerType == ECheckerType::pawn)
-	//{
-	//	// red pawn reaches top (row 7)
-	//	if (checkerColor == ECheckerColor::red && checkerType == ECheckerType::pawn && nextMove.endRow == boardSize - 1)
-	//	{
-	//		SChecker temp(ECheckerColor::red, ECheckerType::queen);
-	//		SetCheckerAt(nextMove.endRow, nextMove.endCol, temp);
-	//	}
-
-	//	// black pawn reaches bottom (row 0)
-	//	if (checkerColor == ECheckerColor::black && checkerType == ECheckerType::pawn && nextMove.endRow == 0)
-	//	{
-	//		SChecker temp(ECheckerColor::black, ECheckerType::queen);
-	//		SetCheckerAt(nextMove.endRow, nextMove.endCol, temp);
-	//	}
-	//}
 }
 
 bool CCheckerBoard::IsValidPosition(int row, int col, ECheckerColor playerSide) const
@@ -335,7 +276,18 @@ bool CCheckerBoard::IsValidPosition(int row, int col, ECheckerColor playerSide) 
 		GetCheckerAt(row, col).color == playerSide;
 }
 
-//bool CCheckerBoard::IsValidPosition(int row, int col, ECheckerColor playerSide) const
-//{
-//	return row >= 0 && row < GetBoardSize() && col >= 0 && col < GetBoardSize() && playerSide == GetColorAt(row, col);
-//}
+bool CCheckerBoard::WasPromoted(const SNextMove& move) const
+{
+	const auto& piece = GetCheckerAt(move.endRow, move.endCol);
+
+	if (piece.type != ECheckerType::queen)
+		return false;
+
+	if (move.checkerColor == ECheckerColor::red && move.endRow == 7)
+		return true;
+
+	if (move.checkerColor == ECheckerColor::black && move.endRow == 0)
+		return true;
+
+	return false;
+}

@@ -53,7 +53,6 @@ bool CRenderBoardGL::InitializeShaders()
         out vec4 FragColor;
 
         uniform sampler2D uTexture;
-        
         uniform bool u_IsSelected;
         uniform vec4 u_HighlightColor;
 
@@ -61,8 +60,9 @@ bool CRenderBoardGL::InitializeShaders()
         {
             vec4 baseColor = texture(uTexture, TexCoord);
 
-            if (u_IsSelected) {
-                baseColor = mix(baseColor, u_HighlightColor, 0.5); // 50% blend
+            if (u_IsSelected)
+            {
+                baseColor = mix(baseColor, u_HighlightColor, 0.3); // 50% blend
             }
 
             FragColor = baseColor;
@@ -349,6 +349,9 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board)
 
     glUseProgram(shaderProgram);
 
+    //every uniform must be explicitly set before the object that depends on it is drawn
+    glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), 0);
+
     GLint loc = glGetUniformLocation(shaderProgram, "uTransform");
     if (loc == -1) {
         std::cerr << "uTransform not found in shader!" << std::endl;
@@ -366,7 +369,6 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board)
 
     glm::mat4 boardTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(boardTransform));
-
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -451,7 +453,7 @@ void CRenderBoardGL::RenderChecker(float x, float y, GLuint texture, bool isSele
 
     // Set selection highlight uniforms
     glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), isSelected ? 1 : 0);
-    glUniform4f(glGetUniformLocation(shaderProgram, "u_HighlightColor"), 1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+    glUniform4f(glGetUniformLocation(shaderProgram, "u_HighlightColor"), 0.85f, 0.85f, 0.85f, 1.0f); // faint grey
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -462,6 +464,9 @@ void CRenderBoardGL::RenderHintDot(float x, float y, GLuint texture)
 {
     glUseProgram(shaderProgram);
     
+    //every uniform must be explicitly set before the object that depends on it is drawn
+    glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), 0);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     // Set projection matrix

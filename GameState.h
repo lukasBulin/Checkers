@@ -31,4 +31,5 @@ private:
 	CCheckerBoard* board = nullptr;
 	SNextMove nextMove;
 	std::vector<std::pair<int, int>> potentialMoves;
+	bool captureOnly = false;
 };

@@ -48,6 +48,8 @@ public:
 
 	bool IsValidPosition(int row, int col, ECheckerColor playerSide) const;
 
+	bool WasPromoted(const SNextMove& move) const;
+
 private:
 
 	static const int boardSize = 8;
