@@ -251,6 +251,16 @@ bool CRenderBoardGL::InitializeRender()
     if (blackQueenCheckerTexture == 0)
         return false;
 
+    // red wins texture
+    redWinsTexture = LoadTexture("Images/RedWins.png");
+    if (redWinsTexture == 0)
+        return false;
+
+    // black wins texture
+    blackWinsTexture = LoadTexture("Images/BlackWins.png");
+    if (blackWinsTexture == 0)
+        return false;
+
     return true;
 }
 
@@ -349,23 +359,48 @@ void CRenderBoardGL::RenderCheckerBoard(const CCheckerBoard* board)
 
     glUseProgram(shaderProgram);
 
-    //every uniform must be explicitly set before the object that depends on it is drawn
-    glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), 0);
-
-    GLint loc = glGetUniformLocation(shaderProgram, "uTransform");
-    if (loc == -1) {
-        std::cerr << "uTransform not found in shader!" << std::endl;
-    }
-
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f, -1.0f, 1.0f);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Game over screen
+    if (gameState->GetGamePhase() == EGamePhase::GameOver)
+    {
+        GLuint winTexture =
+            (gameState->GetWinner() == ECheckerColor::red)
+            ? redWinsTexture
+            : blackWinsTexture;
+
+        glBindVertexArray(boardVAO);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, winTexture);
+        glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
+
+        glm::mat4 transform = glm::mat4(1.0f);
+
+        glUniformMatrix4fv(
+            glGetUniformLocation(shaderProgram, "uTransform"),
+            1,
+            GL_FALSE,
+            glm::value_ptr(transform));
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+        return;
+    }
+
+    //Normal board rendering
+    glUniform1i(glGetUniformLocation(shaderProgram, "u_IsSelected"), 0);
 
     glBindVertexArray(boardVAO);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, boardTexture);
     glUniform1i(glGetUniformLocation(shaderProgram, "uTexture"), 0);
-
 
     glm::mat4 boardTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(boardTransform));

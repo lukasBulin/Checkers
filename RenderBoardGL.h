@@ -64,6 +64,10 @@ private:
 	GLuint redQueenCheckerTexture = 0;
 	GLuint blackQueenCheckerTexture = 0;
 
+	//End of Game
+	GLuint redWinsTexture = 0;
+	GLuint blackWinsTexture = 0;
+
 	int windowWidth = 800;
 	int windowHeight = 800;
 };
