@@ -1,6 +1,6 @@
 # Checkers
 
-TO DO:
-Add AI bot
-Add Turn Indicator
+TO DO:\n
+Add AI bot\n
+Add Turn Indicator\n
 Add Scoreboard
