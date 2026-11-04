@@ -10,6 +10,13 @@ enum EPlayerAction
 	SelectEndPosition
 };
 
+enum EGamePhase
+{
+	StartGameMenu,
+	InGame,
+	GameOver
+};
+
 class CGameState
 {
 public:
@@ -24,7 +31,14 @@ public:
 
 	void CalculatePotentialMoves(int row, int col, ECheckerColor player);
 
+	EGamePhase GetGamePhase() const;
+	ECheckerColor GetWinner() const;
+
+	bool HasPlayerWon(ECheckerColor player) const;
+
 private:
+
+	EGamePhase currentGamePhase = EGamePhase::InGame;
 
 	ECheckerColor activePlayer = ECheckerColor::red;
 	EPlayerAction playerAction = SelectStartChecker;
@@ -32,4 +46,6 @@ private:
 	SNextMove nextMove;
 	std::vector<std::pair<int, int>> potentialMoves;
 	bool captureOnly = false;
+	ECheckerColor winner = ECheckerColor::noColor;
+
 };

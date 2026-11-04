@@ -3,91 +3,102 @@
 
 void CGameState::HandleMouseClick(int row, int col)
 {
-	//player selects start checker
-	if (playerAction == EPlayerAction::SelectStartChecker)
+	if (currentGamePhase == EGamePhase::InGame)
 	{
-		captureOnly = false;
-
-		if (board->IsValidPosition(row, col, activePlayer))
+		//player selects start checker
+		if (playerAction == EPlayerAction::SelectStartChecker)
 		{
-			playerAction = EPlayerAction::SelectEndPosition;
-			nextMove.startRow = row;
-			nextMove.startCol = col;
+			captureOnly = false;
 
-			nextMove.checkerType = board->GetCheckerAt(row, col).type;
-
-			CalculatePotentialMoves(row, col, activePlayer);
-		}
-	}
-	//player selects end position
-	else if (playerAction == EPlayerAction::SelectEndPosition)
-	{
-		// lock player during chaining
-		if (captureOnly)
-		{
-			bool valid = false;
-			for (const auto& move : potentialMoves)
+			if (board->IsValidPosition(row, col, activePlayer))
 			{
-				if (move.first == row && move.second == col)
+				playerAction = EPlayerAction::SelectEndPosition;
+				nextMove.startRow = row;
+				nextMove.startCol = col;
+
+				nextMove.checkerType = board->GetCheckerAt(row, col).type;
+
+				CalculatePotentialMoves(row, col, activePlayer);
+			}
+		}
+		//player selects end position
+		else if (playerAction == EPlayerAction::SelectEndPosition)
+		{
+			// lock player during chaining
+			if (captureOnly)
+			{
+				bool valid = false;
+				for (const auto& move : potentialMoves)
 				{
-					valid = true;
-					break;
+					if (move.first == row && move.second == col)
+					{
+						valid = true;
+						break;
+					}
 				}
+
+				if (!valid)
+					return; // Ignore illegal clicks
 			}
 
-			if (!valid)
-				return; // Ignore illegal clicks
-		}
+			nextMove.endRow = row;
+			nextMove.endCol = col;
+			nextMove.checkerColor = activePlayer;
 
-		nextMove.endRow = row;
-		nextMove.endCol = col;
-		nextMove.checkerColor = activePlayer;
-
-		//if clicked correct move, switch to black
-		if (board->ValidateMove(nextMove))
-		{
-			board->MoveChecker(nextMove);
-			
-			bool isCapture = (nextMove.rowToDelete != SNextMove::invalidCoordinate);
-
-			bool wasPromoted = board->WasPromoted(nextMove);
-
-			// Promotion always ends the turn
-			if (wasPromoted)
+			//if clicked correct move, switch to black
+			if (board->ValidateMove(nextMove))
 			{
+				board->MoveChecker(nextMove);
+
+				//check if game has ended
+				if (HasPlayerWon(activePlayer))
+				{
+					winner = activePlayer;
+					currentGamePhase = EGamePhase::GameOver;
+					return;
+				}
+
+				const bool isCapture = (nextMove.rowToDelete != SNextMove::invalidCoordinate);
+
+				const bool wasPromoted = board->WasPromoted(nextMove);
+
+				// Promotion always ends the turn
+				if (wasPromoted)
+				{
+					playerAction = EPlayerAction::SelectStartChecker;
+					activePlayer = (activePlayer == ECheckerColor::red) ? ECheckerColor::black : ECheckerColor::red;
+					potentialMoves.clear();
+					return;
+				}
+
+				if (isCapture)
+				{
+					captureOnly = true;
+
+					CalculatePotentialMoves(nextMove.endRow, nextMove.endCol, activePlayer);
+
+					if (!potentialMoves.empty())
+					{
+						nextMove.startRow = nextMove.endRow;
+						nextMove.startCol = nextMove.endCol;
+						return; // Continue chaining
+					}
+
+					captureOnly = false; // No chain possible
+				}
+
 				playerAction = EPlayerAction::SelectStartChecker;
-				activePlayer = (activePlayer == ECheckerColor::red) ? ECheckerColor::black : ECheckerColor::red;
+				activePlayer = activePlayer == ECheckerColor::red ? ECheckerColor::black : ECheckerColor::red;
 				potentialMoves.clear();
-				return;
 			}
-
-			if (isCapture)
+			// lock chaining (only can move that specific piece that has been granted chaining)
+			else if (!captureOnly && board->IsValidPosition(row, col, activePlayer))
 			{
-				captureOnly = true;
-
-				CalculatePotentialMoves(nextMove.endRow, nextMove.endCol, activePlayer);
-
-				if (!potentialMoves.empty())
-				{
-					nextMove.startRow = nextMove.endRow;
-					nextMove.startCol = nextMove.endCol;
-					return; // Continue chaining
-				}
-
-				captureOnly = false; // No chain possible
+				nextMove.startRow = row;
+				nextMove.startCol = col;
+				nextMove.checkerType = board->GetCheckerAt(row, col).type;
+				CalculatePotentialMoves(row, col, activePlayer);
 			}
-			
-			playerAction = EPlayerAction::SelectStartChecker;
-			activePlayer = activePlayer == ECheckerColor::red ? ECheckerColor::black : ECheckerColor::red;
-			potentialMoves.clear();
-		}
-		// lock chaining (only can move that specific piece that has been granted chaining)
-		else if (!captureOnly && board->IsValidPosition(row, col, activePlayer))
-		{
-			nextMove.startRow = row;
-			nextMove.startCol = col;
-			nextMove.checkerType = board->GetCheckerAt(row, col).type;
-			CalculatePotentialMoves(row, col, activePlayer);
 		}
 	}
 }
@@ -288,4 +299,35 @@ void CGameState::CalculatePotentialMoves(int row, int col, ECheckerColor player)
 
 		return;
 	}
+}
+
+EGamePhase CGameState::GetGamePhase() const
+{
+	return currentGamePhase;
+}
+
+ECheckerColor CGameState::GetWinner() const
+{
+	return winner;
+}
+
+bool CGameState::HasPlayerWon(ECheckerColor player) const
+{
+	ECheckerColor opponent =
+		(player == ECheckerColor::red)
+		? ECheckerColor::black
+		: ECheckerColor::red;
+
+	for (int row = 0; row < board->GetBoardSize(); row++)
+	{
+		for (int col = 0; col < board->GetBoardSize(); col++)
+		{
+			if (board->GetCheckerAt(row, col).color == opponent)
+			{
+				return false; // opponent still has a piece
+			}
+		}
+	}
+
+	return true; // no opponent pieces found
 }
